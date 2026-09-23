@@ -18,8 +18,11 @@
   body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
   h1,h2,.stage,.brand{font-family:'Oswald',system-ui,sans-serif;}
 
-  header{background:linear-gradient(180deg,var(--navy2),var(--navy));border-bottom:1px solid var(--line);
-    padding:22px 18px 16px;position:sticky;top:0;padding-top:calc(22px + env(safe-area-inset-top,0px));z-index:5;}
+  header{background:linear-gradient(180deg,var(--navy2),var(--navy));
+    border-bottom:1px solid var(--line);
+    padding:22px 18px 16px;
+    position:sticky;top:0;
+    padding-top:calc(22px + env(safe-area-inset-top,0px));z-index:5;}
   .brand{font-size:12.5px;letter-spacing:.08em;color:var(--gold);margin:0 0 4px;}
   h1{font-size:clamp(19px,4.6vw,26px);line-height:1.2;margin:0 0 8px;font-weight:600;}
   .sub{color:var(--ink-dim);font-size:13px;max-width:640px;line-height:1.5;margin:0 0 12px;}
@@ -37,24 +40,27 @@
     padding:22px 18px;color:var(--ink-dim);font-size:14px;line-height:1.6;}
   .error{border-color:#5a2b28;}
   .error b{color:var(--ink);}
+  code{font-size:12px;background:#0d1219;padding:2px 5px;border-radius:4px;}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;margin-bottom:14px;overflow:hidden;}
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
+    margin-bottom:14px;overflow:hidden;}
   .card h2{font-size:15.5px;font-weight:600;margin:0;padding:14px 16px 2px;line-height:1.35;}
   .meta{padding:0 16px 12px;color:var(--ink-dim);font-size:12px;}
-  .stage{font-size:11px;letter-spacing:.06em;color:var(--gold);padding:9px 16px 5px;border-top:1px solid var(--line);}
+  .stage{font-size:11px;letter-spacing:.06em;color:var(--gold);
+    padding:9px 16px 5px;border-top:1px solid var(--line);}
   .bout{padding:8px 16px 12px;}
   .boutmeta{font-size:11px;color:var(--ink-dim);margin-bottom:5px;}
   .pair{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;}
-  .fighter{display:flex;flex-direction:column;gap:1px;font-size:13.5px;padding:7px 9px;border-radius:8px;
-    background:#141b27;border-left:3px solid transparent;}
+  .fighter{display:flex;flex-direction:column;gap:1px;font-size:13.5px;padding:7px 9px;
+    border-radius:8px;background:#141b27;border-left:3px solid transparent;}
   .fighter.chong{border-left-color:var(--chong);}
   .fighter.hong{border-left-color:var(--hong);}
   .fighter.mine{background:rgba(207,159,63,.15);}
-  .fighter .name{font-weight:600;}
+  .fighter .fname{font-weight:600;}
   .fighter .club{font-size:11px;color:var(--ink-dim);}
   .fighter.right{text-align:right;align-items:flex-end;}
-  .score{font-family:'Oswald',system-ui,sans-serif;font-weight:600;font-size:14px;color:var(--ink-dim);
-    min-width:34px;text-align:center;}
+  .score{font-family:'Oswald',system-ui,sans-serif;font-weight:600;font-size:14px;
+    color:var(--ink-dim);min-width:34px;text-align:center;}
   .score.win{color:var(--gold);}
   .tbd{opacity:.45;font-style:italic;}
 </style>
@@ -64,13 +70,15 @@
 <header>
   <p class="brand" id="clubBrand">CLUB CHIRALT</p>
   <h1 id="eventTitle">Cargando campeonato…</h1>
-  <p class="sub">Combates y cuadros en los que participa algún deportista del club. Se lee en
-    directo de la web de la federación cada vez que abres o actualizas esta página.</p>
+  <p class="sub">Combates y cuadros en los que participa algún deportista del club.
+    Los datos se actualizan automáticamente cada 5 minutos via GitHub Actions.</p>
   <div class="bar">
     <button id="refreshBtn">Actualizar ahora</button>
     <span class="status" id="status">—</span>
   </div>
-  <p style="margin-top:8px"><a class="orig" id="origLink" href="#" target="_blank" rel="noopener">Ver la web oficial de la federación ↗</a></p>
+  <p style="margin-top:8px">
+    <a class="orig" id="origLink" href="#" target="_blank" rel="noopener">Ver la web oficial de la federación ↗</a>
+  </p>
 </header>
 
 <main id="main">
@@ -78,151 +86,141 @@
 </main>
 
 <script>
-/* ================= CONFIGURACIÓN =================
-   Para usar esta misma página con OTRO campeonato, tienes dos opciones:
-   1) Sin tocar el archivo: abre esta página añadiendo parámetros en la URL, ej:
-        moncada-chiralt.html?id=57&nombre=Campeonato%20Autonomico
-   2) Editando estos valores por defecto, para tener un archivo fijo por competición.
-   El "id" es el que aparece en la URL oficial de la federación (...&id=41).
-==================================================== */
+/* ============================================================
+   CONFIGURACIÓN — edita este objeto para cada competición
+   Para GitHub Pages: edita este archivo directamente en el repo.
+   Para múltiples competiciones: duplica el repo o usa parámetros URL:
+     index.html?nombre=Campeonato+Autonómico&id=57
+   (el ID se usa solo para el enlace a la web oficial)
+   ============================================================ */
 const DEFAULT_CONFIG = {
-  id: '41',
+  id: '41',                           // ID del campeonato en la web de la federación
   nombre: 'IV Open Taekwondo Ciutat Moncada',
-  clubSigla: 'CHI',      // siglas del club tal y como aparecen en la web (icon_sigla)
-  clubNombre: 'CHIRALT', // nombre completo del club
-  autoRefreshMin: 5
+  clubSigla:  'CHI',                  // siglas tal y como aparecen en la web
+  clubNombre: 'CHIRALT',
+  dataFile:   'data/campeonato.html'  // archivo generado por GitHub Actions
 };
 
 const params = new URLSearchParams(location.search);
-const CONFIG = {
-  id: params.get('id') || DEFAULT_CONFIG.id,
-  nombre: params.get('nombre') || DEFAULT_CONFIG.nombre,
-  clubSigla: (params.get('club') || DEFAULT_CONFIG.clubSigla).toUpperCase(),
-  clubNombre: params.get('clubNombre') || DEFAULT_CONFIG.clubNombre,
-  autoRefreshMin: Number(params.get('refresh')) || DEFAULT_CONFIG.autoRefreshMin
+const CFG = {
+  id:         params.get('id')        || DEFAULT_CONFIG.id,
+  nombre:     params.get('nombre')    || DEFAULT_CONFIG.nombre,
+  clubSigla:  (params.get('club')     || DEFAULT_CONFIG.clubSigla).toUpperCase(),
+  clubNombre: params.get('clubNombre')|| DEFAULT_CONFIG.clubNombre,
+  dataFile:   params.get('dataFile')  || DEFAULT_CONFIG.dataFile
 };
 
-const TARGET_URL = `https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${encodeURIComponent(CONFIG.id)}`;
-const PROXIES = [
-  url => 'https://api.allorigins.win/raw?url=' + encodeURIComponent(url),
-  url => 'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
-  url => 'https://corsproxy.io/?url=' + encodeURIComponent(url)
-];
-
-document.getElementById('clubBrand').textContent = 'CLUB ' + CONFIG.clubNombre;
-document.getElementById('eventTitle').textContent = CONFIG.nombre;
+document.getElementById('clubBrand').textContent   = 'CLUB ' + CFG.clubNombre;
+document.getElementById('eventTitle').textContent   = CFG.nombre;
 document.getElementById('origLink').href =
-  `https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${encodeURIComponent(CONFIG.id)}`;
+  `https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${encodeURIComponent(CFG.id)}`;
 
-const mainEl = document.getElementById('main');
-const statusEl = document.getElementById('status');
+const mainEl     = document.getElementById('main');
+const statusEl   = document.getElementById('status');
 const refreshBtn = document.getElementById('refreshBtn');
 
-function fetchWithTimeout(url, ms){
-  // Ojo: no se usa AbortController/signal a propósito. En algunos visores
-  // (p. ej. la vista previa de archivos de Claude) el fetch se reenvía por
-  // postMessage a otra ventana, y un AbortSignal no se puede clonar ahí —
-  // eso provocaba "DataCloneError". Por eso el timeout se hace con una
-  // carrera de promesas en vez de abortar la petición real.
-  const timeout = new Promise((_, reject) =>
-    setTimeout(() => reject(new Error('tiempo de espera agotado')), ms));
-  const req = fetch(url, {cache:'no-store'}).then(res => {
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    return res.text();
-  });
-  return Promise.race([req, timeout]);
-}
-
+/* ---- Carga el archivo estático del propio repo (sin CORS) ---- */
 async function fetchSource(){
-  const attempts = [];
-  for (const build of PROXIES){
-    const proxyUrl = build(TARGET_URL);
-    try{
-      const text = await fetchWithTimeout(proxyUrl, 12000);
-      if (text && text.length > 1000 && text.includes('piramide')) return text;
-      attempts.push(proxyUrl + ' → respuesta inesperada (' + (text ? text.length : 0) + ' bytes)');
-    }catch(e){
-      attempts.push(proxyUrl + ' → ' + (e && e.message ? e.message : e));
-    }
-  }
-  const err = new Error('Ningún proxy respondió correctamente.');
-  err.detail = attempts.join('\n');
-  throw err;
+  // Añade timestamp para evitar caché del navegador
+  const url = CFG.dataFile + '?t=' + Date.now();
+  const res = await fetch(url, {cache: 'no-store'});
+  if (!res.ok) throw new Error('HTTP ' + res.status + ' al leer ' + CFG.dataFile);
+  const text = await res.text();
+  if (!text || text.length < 500 || text.includes('<!-- placeholder -->'))
+    throw new Error('placeholder — el workflow de GitHub Actions aún no ha corrido');
+  return text;
 }
 
-// ---------- Parser basado en la estructura real de la web (clases CSS) ----------
-
-function textOf(el){ return el ? el.textContent.replace(/\s+/g,' ').trim() : ''; }
+/* ---- Parser DOM (estructura real de la web de la federación) ---- */
+function t(el){ return el ? el.textContent.replace(/\s+/g,' ').trim() : ''; }
 
 function parseFighter(slot){
   if (!slot) return null;
   const nameEl = slot.querySelector('.catleta_nombre');
-  if (!nameEl) return { tbd: true };
-  const scoreEl = slot.querySelector('[class^="cscore_"]');
-  const sigla = textOf(slot.querySelector('.icon_sigla'));
-  const clubFull = slot.getAttribute('title') || textOf(slot.querySelector('.catleta_data > span'));
-  const isBlue = /competidor1/.test(slot.className);
+  if (!nameEl) return {tbd:true};
+  const scoreEl = slot.querySelector('[class*="cscore_"]');
+  const sigla   = t(slot.querySelector('.icon_sigla'));
+  const clubFull= slot.getAttribute('title') || t(slot.querySelector('.catleta_data span'));
   return {
-    name: textOf(nameEl),
-    sigla, clubFull,
-    corner: isBlue ? 'chong' : 'hong',
-    score: scoreEl ? (textOf(scoreEl).match(/\d+/) || [])[0] : undefined
+    name: t(nameEl), sigla, clubFull,
+    corner: /competidor1/.test(slot.className) ? 'chong' : 'hong',
+    score: scoreEl ? (t(scoreEl).match(/\d+/)||[])[0] : undefined
   };
 }
 
 function isMine(f){
   if (!f || f.tbd) return false;
-  return f.sigla === CONFIG.clubSigla || (f.clubFull || '').toUpperCase() === CONFIG.clubNombre.toUpperCase();
+  return f.sigla === CFG.clubSigla ||
+    (f.clubFull||'').toUpperCase() === CFG.clubNombre.toUpperCase();
 }
 
-function parseBracket(bracket){
-  const id = textOf(bracket.querySelector('.bloque_titulo .resaltar'));
-  const title = textOf(bracket.querySelector('.bloque_titulo .texto'));
+function parseBracket(el){
+  const title  = t(el.querySelector('.bloque_titulo .texto'));
   const stages = [];
-  let current = null;
-
-  const nodes = bracket.querySelectorAll('.ronda_tit, .competencia');
-  for (const node of nodes){
+  let cur = null;
+  for (const node of el.querySelectorAll('.ronda_tit, .competencia')){
     if (node.classList.contains('ronda_tit')){
-      current = { name: textOf(node), bouts: [] };
-      stages.push(current);
-      continue;
+      cur = {name: t(node), bouts:[]};
+      stages.push(cur);
+    } else if (cur){
+      const dataText = t(node.querySelector('.contienda_data'));
+      const isBye   = /\bBYE\b/.test(dataText);
+      const fighters= [...node.querySelectorAll('.competidores > div')].map(parseFighter);
+      cur.bouts.push({meta: dataText.replace(/\bBYE\b/,'').trim(), isBye, fighters});
     }
-    if (!current) continue; // salvaguarda por si el markup cambia
-    const dataText = textOf(node.querySelector('.contienda_data'));
-    const isBye = /\bBYE\b/.test(dataText);
-    const slots = [...node.querySelectorAll('.competidores > div')];
-    const fighters = slots.map(parseFighter);
-    current.bouts.push({ meta: dataText.replace(/\bBYE\b/, '').trim(), isBye, fighters });
   }
-  return { id, title, stages };
+  return {title, stages};
 }
 
-function boutIsMine(bout){ return bout.fighters.some(isMine); }
+/* ---- Render ---- */
+function esc(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function fighterEl(f, right, isBye){
+  const el = document.createElement('div');
+  if (!f || f.tbd){
+    el.className = 'fighter' + (right?' right':'');
+    el.innerHTML = `<span class="fname tbd">${isBye?'Bye':'Por determinar'}</span>`;
+    return el;
+  }
+  el.className = 'fighter ' + f.corner + (right?' right':'') + (isMine(f)?' mine':'');
+  el.innerHTML = `<span class="fname">${esc(f.name)}</span>`
+    + (f.clubFull?`<span class="club">${esc(f.clubFull)}</span>`:'');
+  return el;
+}
+
+function scoreEl(a, b){
+  const el = document.createElement('div');
+  const sa = a&&a.score, sb = b&&b.score;
+  if (sa===undefined && sb===undefined){ el.className='score'; el.textContent='vs'; return el; }
+  el.className = 'score win';
+  el.textContent = (sa??'–') + ' - ' + (sb??'–');
+  return el;
+}
 
 function render(brackets){
   mainEl.innerHTML = '';
   const relevant = [];
   for (const b of brackets){
     const stages = b.stages
-      .map(s => ({ name: s.name, bouts: s.bouts.filter(boutIsMine) }))
-      .filter(s => s.bouts.length);
-    if (stages.length) relevant.push({ ...b, stages });
+      .map(s=>({name:s.name, bouts:s.bouts.filter(bo=>bo.fighters.some(isMine))}))
+      .filter(s=>s.bouts.length);
+    if (stages.length) relevant.push({...b, stages});
   }
 
   if (!relevant.length){
-    mainEl.innerHTML = `<div class="empty">No se ha encontrado ningún combate o cuadro con participantes de
-      ${CONFIG.clubNombre} en esta lectura. Puede que los cuadros todavía no estén emparejados,
-      o que el ID de campeonato (<b>${CONFIG.id}</b>) no sea el correcto.</div>`;
+    mainEl.innerHTML = `<div class="empty">No se encontraron combates con participantes de
+      <b>${esc(CFG.clubNombre)}</b> en los datos actuales. Puede que los cuadros todavía no
+      estén publicados, o que el workflow de GitHub Actions aún no haya corrido.
+      <br><br>Ve a <b>GitHub → Actions → Actualizar datos campeonato → Run workflow</b> para
+      forzar la primera descarga.</div>`;
     return;
   }
 
   for (const b of relevant){
     const card = document.createElement('div');
     card.className = 'card';
-
+    const [main,...rest] = b.title.split('/');
     const h2 = document.createElement('h2');
-    const [main, ...rest] = b.title.split('/');
     h2.textContent = main.trim();
     card.appendChild(h2);
     if (rest.length){
@@ -231,13 +229,11 @@ function render(brackets){
       meta.textContent = rest.join(' · ').trim();
       card.appendChild(meta);
     }
-
     for (const stage of b.stages){
       const st = document.createElement('div');
       st.className = 'stage';
       st.textContent = stage.name;
       card.appendChild(st);
-
       for (const bout of stage.bouts){
         const row = document.createElement('div');
         row.className = 'bout';
@@ -249,8 +245,8 @@ function render(brackets){
         }
         const pair = document.createElement('div');
         pair.className = 'pair';
-        const [a, b2] = bout.fighters;
-        pair.appendChild(fighterEl(a, false));
+        const [a,b2] = bout.fighters;
+        pair.appendChild(fighterEl(a, false, false));
         pair.appendChild(scoreEl(a, b2));
         pair.appendChild(fighterEl(b2, true, bout.isBye));
         row.appendChild(pair);
@@ -261,68 +257,38 @@ function render(brackets){
   }
 }
 
-function fighterEl(f, right, isBye){
-  const el = document.createElement('div');
-  if (!f || f.tbd){
-    el.className = 'fighter' + (right ? ' right' : '');
-    el.innerHTML = `<span class="name tbd">${isBye ? 'Bye' : 'Por determinar'}</span>`;
-    return el;
-  }
-  el.className = 'fighter ' + f.corner + (right ? ' right' : '') + (isMine(f) ? ' mine' : '');
-  el.innerHTML = `<span class="name">${escapeHtml(f.name)}</span>` +
-    (f.clubFull ? `<span class="club">${escapeHtml(f.clubFull)}</span>` : '');
-  return el;
-}
-
-function scoreEl(a, b){
-  const el = document.createElement('div');
-  const sa = a && a.score, sb = b && b.score;
-  if (sa === undefined && sb === undefined){
-    el.className = 'score'; el.textContent = 'vs';
-    return el;
-  }
-  const win = sa !== undefined && sb !== undefined && Number(sa) > Number(sb);
-  const winB = sa !== undefined && sb !== undefined && Number(sb) > Number(sa);
-  el.className = 'score' + (win || winB ? ' win' : '');
-  el.textContent = (sa ?? '–') + ' - ' + (sb ?? '–');
-  return el;
-}
-
-function escapeHtml(s){
-  return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-}
-
+/* ---- Loop principal ---- */
 async function load(auto){
   refreshBtn.disabled = true;
   statusEl.textContent = 'Actualizando…';
   try{
     const html = await fetchSource();
-    const doc = new DOMParser().parseFromString(html, 'text/html');
+    const doc  = new DOMParser().parseFromString(html, 'text/html');
     const brackets = [...doc.querySelectorAll('.piramide')].map(parseBracket);
-    if (!brackets.length) throw new Error('no se encontraron cuadros en la página descargada');
+    if (!brackets.length) throw new Error('No se encontraron cuadros (.piramide) en el archivo descargado.');
     render(brackets);
     statusEl.innerHTML = 'Última actualización: <b>' + new Date().toLocaleTimeString('es-ES') + '</b>';
   }catch(e){
     console.error(e);
     if (!auto || !mainEl.querySelector('.card')){
-      mainEl.innerHTML = `<div class="error"><b>No se ha podido leer la web de la federación.</b><br><br>
-        Suele deberse a que el servicio intermedio que permite leer entre webs está saturado,
-        o a que la página está abierta como archivo local (<code>file://</code>), lo que algunos
-        proxies bloquean. Pulsa «Actualizar ahora» en unos segundos, prueba a alojar este archivo
-        en una web real (GitHub Pages, por ejemplo), o comprueba con el enlace de arriba que el
-        campeonato con ID <b>${CONFIG.id}</b> sigue existiendo.
-        ${e.detail ? '<br><br><b>Detalle técnico:</b><br><span style="font-family:monospace;font-size:11.5px;white-space:pre-wrap">' + escapeHtml(e.detail) + '</span>' : ''}
-        </div>`;
+      mainEl.innerHTML = `<div class="error">
+        <b>No se pudieron cargar los datos.</b><br><br>
+        ${esc(e.message)}<br><br>
+        Si acabas de configurar el repo, ve a <b>GitHub → Actions → "Actualizar datos campeonato"
+        → Run workflow</b> para lanzar la primera descarga manualmente.
+        El archivo <code>${esc(CFG.dataFile)}</code> debe existir en el repo con datos reales.
+      </div>`;
     }
-    statusEl.textContent = 'No se pudo actualizar (reintentando automáticamente).';
-  }finally{
+    statusEl.textContent = 'Error al cargar.';
+  } finally {
     refreshBtn.disabled = false;
   }
 }
 
 refreshBtn.addEventListener('click', () => load(false));
 load(false);
-setInterval(() => load(true), CONFIG.autoRefreshMin * 60 * 1000);
+// Recarga cada 2 minutos — el workflow actualiza cada 5, así que esto es suficiente
+setInterval(() => load(true), 2 * 60 * 1000);
 </script>
 </body>
 </html>
