@@ -21,7 +21,7 @@ jobs:
           curl -s \
             --max-time 30 \
             --user-agent "Mozilla/5.0 (compatible; ClubChiralt-bot)" \
-            "https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=41" \
+            "https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=108" \
             -o data/campeonato.html
 
       - name: Confirmar y publicar cambios
