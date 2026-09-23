@@ -94,8 +94,8 @@
    (el ID se usa solo para el enlace a la web oficial)
    ============================================================ */
 const DEFAULT_CONFIG = {
-  id: '108',                           // ID del campeonato en la web de la federación
-  nombre: 'VI OPEN TAEKWONDO CIUTAT MONCADA',
+  id: '41',                           // ID del campeonato en la web de la federación
+  nombre: 'IV Open Taekwondo Ciutat Moncada',
   clubSigla:  'CHI',                  // siglas tal y como aparecen en la web
   clubNombre: 'CHIRALT',
   dataFile:   'data/campeonato.html'  // archivo generado por GitHub Actions
@@ -136,14 +136,28 @@ function t(el){ return el ? el.textContent.replace(/\s+/g,' ').trim() : ''; }
 
 function parseFighter(slot){
   if (!slot) return null;
+
+  const scoreEl  = slot.querySelector('[class*="cscore_"]');
+  const sigla    = t(slot.querySelector('.icon_sigla'));
+  const corner   = /competidor1/.test(slot.className) ? 'chong' : 'hong';
+  const clubFull = slot.getAttribute('title') || '';
+
+  // Nombre: en rondas iniciales existe .catleta_nombre; en rondas posteriores
+  // la federación lo omite y solo deja el title del img (ej: "PÉREZ PÉREZ EVA\nCHIRALT")
   const nameEl = slot.querySelector('.catleta_nombre');
-  if (!nameEl) return {tbd:true};
-  const scoreEl = slot.querySelector('[class*="cscore_"]');
-  const sigla   = t(slot.querySelector('.icon_sigla'));
-  const clubFull= slot.getAttribute('title') || t(slot.querySelector('.catleta_data span'));
+  let name = nameEl ? t(nameEl) : '';
+  if (!name){
+    const imgTitle = (slot.querySelector('img.icon_foto')||{}).title || '';
+    // El title tiene formato "APELLIDO NOMBRE\nCLUB" — tomamos la primera línea
+    name = imgTitle.split(/\n/)[0].trim();
+  }
+
+  // Si después de todo no hay nombre ni sigla, es un hueco vacío (aún no emparejado)
+  if (!name && !sigla) return {tbd: true};
+
   return {
-    name: t(nameEl), sigla, clubFull,
-    corner: /competidor1/.test(slot.className) ? 'chong' : 'hong',
+    name: name || '—', sigla, clubFull,
+    corner,
     score: scoreEl ? (t(scoreEl).match(/\d+/)||[])[0] : undefined
   };
 }
