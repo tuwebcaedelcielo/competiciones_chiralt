@@ -1,16 +1,22 @@
 name: Actualizar datos campeonato
 
+# ================================================================
+# ÚNICA FUENTE DE VERDAD — edita solo estas dos líneas:
+env:
+  CAMPEONATO_ID: "41"
+  CAMPEONATO_CLUB: "CHI"   # siglas del club (icon_sigla en la web)
+# ================================================================
+
 on:
   schedule:
-    # Cada 5 minutos (GitHub lo ejecuta aprox. cada 5 min en días activos)
-    - cron: '*/5 * * * *'
-  workflow_dispatch:   # también se puede lanzar a mano desde la interfaz de GitHub
+    - cron: '*/5 * * * *'   # cada 5 minutos
+  workflow_dispatch:          # también se puede lanzar a mano desde GitHub
 
 jobs:
   fetch:
     runs-on: ubuntu-latest
     permissions:
-      contents: write   # necesario para hacer git push al repo
+      contents: write
 
     steps:
       - name: Checkout repo
@@ -21,14 +27,22 @@ jobs:
           curl -s \
             --max-time 30 \
             --user-agent "Mozilla/5.0 (compatible; ClubChiralt-bot)" \
-            "https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=108" \
+            "https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${CAMPEONATO_ID}" \
             -o data/campeonato.html
+
+      - name: Guardar configuración para la web
+        run: |
+          cat > data/config.json << EOF
+          {
+            "id": "${CAMPEONATO_ID}",
+            "clubSigla": "${CAMPEONATO_CLUB}"
+          }
+          EOF
 
       - name: Confirmar y publicar cambios
         run: |
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/campeonato.html
-          # Solo hace commit si el archivo cambió
+          git add data/campeonato.html data/config.json
           git diff --cached --quiet || git commit -m "Actualizar datos campeonato [skip ci]"
           git push
