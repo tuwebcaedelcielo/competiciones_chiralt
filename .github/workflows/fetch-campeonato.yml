@@ -3,7 +3,7 @@ name: Actualizar datos campeonato
 # ================================================================
 # ÚNICA FUENTE DE VERDAD — edita solo estas dos líneas:
 env:
-  CAMPEONATO_ID: "41"
+  CAMPEONATO_ID: "108"
   CAMPEONATO_CLUB: "CHI"   # siglas del club (icon_sigla en la web)
 # ================================================================
 
