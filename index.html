@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Chiralt · Seguimiento en directo</title>
+<title>Chiralt · Seguimiento</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
@@ -16,282 +16,347 @@
   *{box-sizing:border-box;}
   html,body{margin:0;background:var(--navy);color:var(--ink);font-family:'Inter',system-ui,sans-serif;}
   body{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);}
-  h1,h2,.stage,.brand{font-family:'Oswald',system-ui,sans-serif;}
+  h1,h2,.stage,.brand,.ronda-tit{font-family:'Oswald',system-ui,sans-serif;}
 
-  header{background:linear-gradient(180deg,var(--navy2),var(--navy));
+  header{
+    background:linear-gradient(180deg,var(--navy2),var(--navy));
     border-bottom:1px solid var(--line);
     padding:22px 18px 16px;
-    position:sticky;top:0;
-    padding-top:calc(22px + env(safe-area-inset-top,0px));z-index:5;}
-  .brand{font-size:12.5px;letter-spacing:.08em;color:var(--gold);margin:0 0 4px;}
-  h1{font-size:clamp(19px,4.6vw,26px);line-height:1.2;margin:0 0 8px;font-weight:600;}
-  .sub{color:var(--ink-dim);font-size:13px;max-width:640px;line-height:1.5;margin:0 0 12px;}
+    padding-top:calc(22px + env(safe-area-inset-top,0px));
+    position:sticky;top:0;z-index:5;
+  }
+  .brand{font-size:12.5px;letter-spacing:.08em;color:var(--gold);margin:0 0 2px;}
+  h1{font-size:clamp(18px,4.5vw,26px);line-height:1.2;margin:0 0 3px;font-weight:600;}
+  .subtitle{color:var(--ink-dim);font-size:12px;margin:0 0 12px;}
   .bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;}
   button{font:inherit;font-weight:600;font-size:13px;background:var(--hong);color:#fff;
     border:none;border-radius:8px;padding:9px 15px;cursor:pointer;}
   button[disabled]{opacity:.5;}
   .status{font-size:12px;color:var(--ink-dim);}
   .status b{color:var(--ink);}
-  a.orig{color:var(--chong);text-decoration:none;font-size:12.5px;}
+  a.orig{color:var(--chong);text-decoration:none;font-size:12px;}
   a.orig:hover{text-decoration:underline;}
 
-  main{max-width:760px;margin:0 auto;padding:18px 14px 60px;}
-  .empty,.error{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  main{max-width:820px;margin:0 auto;padding:18px 14px 60px;}
+  .msg{background:var(--card);border:1px solid var(--line);border-radius:12px;
     padding:22px 18px;color:var(--ink-dim);font-size:14px;line-height:1.6;}
-  .error{border-color:#5a2b28;}
-  .error b{color:var(--ink);}
-  code{font-size:12px;background:#0d1219;padding:2px 5px;border-radius:4px;}
+  .msg.err{border-color:#5a2b28;}
+  .msg b{color:var(--ink);}
+  code{font-size:11.5px;background:#0d1219;padding:2px 5px;border-radius:4px;}
 
-  .card{background:var(--card);border:1px solid var(--line);border-radius:12px;
-    margin-bottom:14px;overflow:hidden;}
-  .card h2{font-size:15.5px;font-weight:600;margin:0;padding:14px 16px 2px;line-height:1.35;}
-  .meta{padding:0 16px 12px;color:var(--ink-dim);font-size:12px;}
-  .stage{font-size:11px;letter-spacing:.06em;color:var(--gold);
-    padding:9px 16px 5px;border-top:1px solid var(--line);}
-  .bout{padding:8px 16px 12px;}
-  .boutmeta{font-size:11px;color:var(--ink-dim);margin-bottom:5px;}
-  .pair{display:grid;grid-template-columns:1fr auto 1fr;gap:6px;align-items:center;}
-  .fighter{display:flex;flex-direction:column;gap:1px;font-size:13.5px;padding:7px 9px;
-    border-radius:8px;background:#141b27;border-left:3px solid transparent;}
+  /* ── Category card ── */
+  .cat-card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:12px;margin-bottom:20px;overflow:hidden;
+  }
+  .cat-head{padding:14px 16px 10px;border-bottom:1px solid var(--line);}
+  .cat-head h2{font-size:15px;font-weight:600;margin:0 0 2px;line-height:1.3;}
+  .cat-head .cat-meta{font-size:11.5px;color:var(--ink-dim);}
+  /* mine badge on category header */
+  .mine-badge{
+    display:inline-block;font-size:10px;letter-spacing:.05em;font-family:'Oswald',system-ui,sans-serif;
+    background:rgba(207,159,63,.2);color:var(--gold);border:1px solid rgba(207,159,63,.4);
+    border-radius:5px;padding:1px 6px;margin-left:8px;vertical-align:middle;
+  }
+
+  /* ── Round columns layout ── */
+  .bracket-scroll{overflow-x:auto;padding:0 16px 16px;}
+  .bracket-columns{display:flex;gap:0;min-width:min-content;}
+
+  .ronda-col{flex:0 0 auto;min-width:180px;max-width:220px;}
+  .ronda-col + .ronda-col{border-left:1px solid var(--line);}
+  .ronda-tit{
+    font-size:10.5px;letter-spacing:.07em;color:var(--gold);
+    padding:8px 12px 6px;border-bottom:1px solid var(--line);
+    position:sticky;top:0;background:var(--card);z-index:2;
+  }
+
+  /* ── Individual bout ── */
+  .bout{padding:10px 10px 10px;}
+  .bout + .bout{border-top:1px solid var(--line);}
+  .bout-meta{font-size:10px;color:var(--ink-dim);margin-bottom:6px;}
+
+  .fighter{
+    display:flex;align-items:center;gap:7px;
+    padding:6px 8px;border-radius:7px;background:#141b27;
+    border-left:3px solid transparent;margin-bottom:3px;
+    position:relative;
+  }
+  .fighter:last-child{margin-bottom:0;}
   .fighter.chong{border-left-color:var(--chong);}
   .fighter.hong{border-left-color:var(--hong);}
-  .fighter.mine{background:rgba(207,159,63,.15);}
-  .fighter .fname{font-weight:600;}
-  .fighter .club{font-size:11px;color:var(--ink-dim);}
-  .fighter.right{text-align:right;align-items:flex-end;}
-  .score{font-family:'Oswald',system-ui,sans-serif;font-weight:600;font-size:14px;
-    color:var(--ink-dim);min-width:34px;text-align:center;}
-  .score.win{color:var(--gold);}
-  .tbd{opacity:.45;font-style:italic;}
+  .fighter.mine{background:rgba(207,159,63,.13);border-color:var(--gold);}
+  .fighter-info{flex:1;min-width:0;}
+  .fighter .fname{font-weight:600;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fighter .fclub{font-size:10.5px;color:var(--ink-dim);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .fighter .fscore{
+    font-family:'Oswald',system-ui,sans-serif;font-weight:700;font-size:15px;
+    color:var(--ink-dim);min-width:20px;text-align:right;flex-shrink:0;
+  }
+  .fighter .fscore.winner{color:var(--gold);}
+  .fighter.tbd .fname{opacity:.4;font-style:italic;font-weight:400;}
+
+  /* ── Chiralt-only filter toggle ── */
+  .filter-bar{
+    display:flex;align-items:center;gap:10px;
+    padding:10px 16px;border-bottom:1px solid var(--line);
+  }
+  .filter-bar label{font-size:13px;color:var(--ink-dim);cursor:pointer;display:flex;align-items:center;gap:6px;}
+  .filter-bar input[type=checkbox]{accent-color:var(--gold);width:15px;height:15px;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <header>
-  <p class="brand" id="clubBrand">CLUB CHIRALT</p>
-  <h1 id="eventTitle">Cargando campeonato…</h1>
-  <p class="sub">Combates y cuadros en los que participa algún deportista del club.
-    Los datos se actualizan automáticamente cada 5 minutos via GitHub Actions.</p>
+  <p class="brand">CLUB CHIRALT</p>
+  <h1 id="eventTitle">Cargando…</h1>
+  <p class="subtitle" id="eventSubtitle"></p>
   <div class="bar">
     <button id="refreshBtn">Actualizar ahora</button>
     <span class="status" id="status">—</span>
   </div>
   <p style="margin-top:8px">
-    <a class="orig" id="origLink" href="#" target="_blank" rel="noopener">Ver la web oficial de la federación ↗</a>
+    <a class="orig" id="origLink" href="#" target="_blank" rel="noopener">Ver en la web de la federación ↗</a>
   </p>
 </header>
 
 <main id="main">
-  <div class="empty">Cargando…</div>
+  <div class="msg">Cargando datos…</div>
 </main>
 
 <script>
-/* ============================================================
-   CONFIGURACIÓN — edita este objeto para cada competición
-   Para GitHub Pages: edita este archivo directamente en el repo.
-   Para múltiples competiciones: duplica el repo o usa parámetros URL:
-     index.html?nombre=Campeonato+Autonómico&id=57
-   (el ID se usa solo para el enlace a la web oficial)
-   ============================================================ */
-const DEFAULT_CONFIG = {
-  id: '41',                           // ID del campeonato en la web de la federación
-  nombre: 'IV Open Taekwondo Ciutat Moncada',
-  clubSigla:  'CHI',                  // siglas tal y como aparecen en la web
-  clubNombre: 'CHIRALT',
-  dataFile:   'data/campeonato.html'  // archivo generado por GitHub Actions
-};
+/* La configuración se lee de data/config.json, generado por GitHub Actions.
+   Solo tienes que cambiar las variables en el workflow (fetch-campeonato.yml). */
 
-const params = new URLSearchParams(location.search);
-const CFG = {
-  id:         params.get('id')        || DEFAULT_CONFIG.id,
-  nombre:     params.get('nombre')    || DEFAULT_CONFIG.nombre,
-  clubSigla:  (params.get('club')     || DEFAULT_CONFIG.clubSigla).toUpperCase(),
-  clubNombre: params.get('clubNombre')|| DEFAULT_CONFIG.clubNombre,
-  dataFile:   params.get('dataFile')  || DEFAULT_CONFIG.dataFile
-};
-
-document.getElementById('clubBrand').textContent   = 'CLUB ' + CFG.clubNombre;
-document.getElementById('eventTitle').textContent   = CFG.nombre;
-document.getElementById('origLink').href =
-  `https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${encodeURIComponent(CFG.id)}`;
-
-const mainEl     = document.getElementById('main');
-const statusEl   = document.getElementById('status');
+const mainEl   = document.getElementById('main');
+const statusEl = document.getElementById('status');
 const refreshBtn = document.getElementById('refreshBtn');
 
-/* ---- Carga el archivo estático del propio repo (sin CORS) ---- */
-async function fetchSource(){
-  // Añade timestamp para evitar caché del navegador
-  const url = CFG.dataFile + '?t=' + Date.now();
-  const res = await fetch(url, {cache: 'no-store'});
-  if (!res.ok) throw new Error('HTTP ' + res.status + ' al leer ' + CFG.dataFile);
-  const text = await res.text();
-  if (!text || text.length < 500 || text.includes('<!-- placeholder -->'))
-    throw new Error('placeholder — el workflow de GitHub Actions aún no ha corrido');
-  return text;
+function esc(s){
+  if (!s) return '';
+  return String(s).replace(/[&<>"']/g,
+    c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
-
-/* ---- Parser DOM (estructura real de la web de la federación) ---- */
 function t(el){ return el ? el.textContent.replace(/\s+/g,' ').trim() : ''; }
 
+/* ── Load config + data ── */
+async function loadAll(){
+  const [cfgRes, dataRes] = await Promise.all([
+    fetch('data/config.json?t=' + Date.now(), {cache:'no-store'}),
+    fetch('data/campeonato.html?t=' + Date.now(), {cache:'no-store'})
+  ]);
+  if (!cfgRes.ok)  throw new Error('No se pudo leer data/config.json (HTTP ' + cfgRes.status + ')');
+  if (!dataRes.ok) throw new Error('No se pudo leer data/campeonato.html (HTTP ' + dataRes.status + ')');
+
+  const cfg  = await cfgRes.json();
+  const html = await dataRes.text();
+
+  if (!html || html.length < 500 || html.includes('<!-- placeholder -->'))
+    throw new Error('El archivo de datos aún es el placeholder. Ve a GitHub → Actions → "Actualizar datos campeonato" → Run workflow para lanzar la primera descarga.');
+
+  return {cfg, html};
+}
+
+/* ── Parse federation HTML ── */
 function parseFighter(slot){
   if (!slot) return null;
-
   const scoreEl  = slot.querySelector('[class*="cscore_"]');
   const sigla    = t(slot.querySelector('.icon_sigla'));
   const corner   = /competidor1/.test(slot.className) ? 'chong' : 'hong';
-  const clubFull = slot.getAttribute('title') || '';
+  const clubTitle= (slot.getAttribute('title') || '').trim();
 
-  // Nombre: en rondas iniciales existe .catleta_nombre; en rondas posteriores
-  // la federación lo omite y solo deja el title del img (ej: "PÉREZ PÉREZ EVA\nCHIRALT")
   const nameEl = slot.querySelector('.catleta_nombre');
   let name = nameEl ? t(nameEl) : '';
+  let clubFromImg = '';
+
   if (!name){
-    const imgTitle = (slot.querySelector('img.icon_foto')||{}).title || '';
-    // El title tiene formato "APELLIDO NOMBRE\nCLUB" — tomamos la primera línea
-    name = imgTitle.split(/\n/)[0].trim();
+    const imgEl = slot.querySelector('img.icon_foto');
+    const raw   = imgEl ? (imgEl.getAttribute('title') || '') : '';
+    const lines = raw.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+    name        = lines[0] || '';
+    clubFromImg = lines[1] || '';
   }
 
-  // Si después de todo no hay nombre ni sigla, es un hueco vacío (aún no emparejado)
-  if (!name && !sigla) return {tbd: true};
+  if (!name && !sigla) return {tbd:true};
+
+  const rawScore = scoreEl ? t(scoreEl).replace(/<[^>]*>/g,'').trim() : undefined;
+  const score    = rawScore && /\d/.test(rawScore) ? rawScore.match(/\d+/)[0] : undefined;
 
   return {
-    name: name || '—', sigla, clubFull,
+    name: name || '—',
+    sigla,
+    club: clubTitle || clubFromImg || sigla,
     corner,
-    score: scoreEl ? (t(scoreEl).match(/\d+/)||[])[0] : undefined
+    score
   };
 }
 
-function isMine(f){
-  if (!f || f.tbd) return false;
-  return f.sigla === CFG.clubSigla ||
-    (f.clubFull||'').toUpperCase() === CFG.clubNombre.toUpperCase();
-}
+function parseBrackets(doc){
+  return [...doc.querySelectorAll('.piramide')].map(piramide => {
+    const titleEl = piramide.querySelector('.bloque_titulo .texto');
+    const fullTitle = t(titleEl);
+    const [catName, ...rest] = fullTitle.split('/');
 
-function parseBracket(el){
-  const title  = t(el.querySelector('.bloque_titulo .texto'));
-  const stages = [];
-  let cur = null;
-  for (const node of el.querySelectorAll('.ronda_tit, .competencia')){
-    if (node.classList.contains('ronda_tit')){
-      cur = {name: t(node), bouts:[]};
-      stages.push(cur);
-    } else if (cur){
-      const dataText = t(node.querySelector('.contienda_data'));
-      const isBye   = /\bBYE\b/.test(dataText);
-      const fighters= [...node.querySelectorAll('.competidores > div')].map(parseFighter);
-      cur.bouts.push({meta: dataText.replace(/\bBYE\b/,'').trim(), isBye, fighters});
+    // Collect rounds in order
+    const rounds = [];
+    let curRound = null;
+
+    for (const node of piramide.querySelectorAll('.ronda_tit, .competencia')){
+      if (node.classList.contains('ronda_tit')){
+        curRound = {name: t(node), bouts: []};
+        rounds.push(curRound);
+      } else if (curRound) {
+        const metaEl = node.querySelector('.contienda_data');
+        const metaText = t(metaEl);
+        const isBye = /\bBYE\b/.test(metaText);
+        const fighters = [...node.querySelectorAll('.competidores > div')].map(parseFighter);
+        curRound.bouts.push({
+          meta: metaText.replace(/\bBYE\b/g,'').trim(),
+          isBye,
+          fighters
+        });
+      }
     }
-  }
-  return {title, stages};
+    return {catName: catName.trim(), catMeta: rest.join(' · ').trim(), rounds};
+  });
 }
 
-/* ---- Render ---- */
-function esc(s){ return s.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-
-function fighterEl(f, right, isBye){
-  const el = document.createElement('div');
-  if (!f || f.tbd){
-    el.className = 'fighter' + (right?' right':'');
-    el.innerHTML = `<span class="fname tbd">${isBye?'Bye':'Por determinar'}</span>`;
-    return el;
-  }
-  el.className = 'fighter ' + f.corner + (right?' right':'') + (isMine(f)?' mine':'');
-  el.innerHTML = `<span class="fname">${esc(f.name)}</span>`
-    + (f.clubFull?`<span class="club">${esc(f.clubFull)}</span>`:'');
-  return el;
+/* ── Check if bracket contains a Chiralt competitor ── */
+function makeIsMine(clubSigla){
+  const SIGLA = clubSigla.toUpperCase();
+  return function isMine(f){
+    if (!f || f.tbd) return false;
+    return f.sigla === SIGLA || (f.club||'').toUpperCase().includes(SIGLA);
+  };
 }
 
-function scoreEl(a, b){
-  const el = document.createElement('div');
-  const sa = a&&a.score, sb = b&&b.score;
-  if (sa===undefined && sb===undefined){ el.className='score'; el.textContent='vs'; return el; }
-  el.className = 'score win';
-  el.textContent = (sa??'–') + ' - ' + (sb??'–');
-  return el;
-}
-
-function render(brackets){
+/* ── Render ── */
+function render(brackets, isMine, eventId){
   mainEl.innerHTML = '';
-  const relevant = [];
-  for (const b of brackets){
-    const stages = b.stages
-      .map(s=>({name:s.name, bouts:s.bouts.filter(bo=>bo.fighters.some(isMine))}))
-      .filter(s=>s.bouts.length);
-    if (stages.length) relevant.push({...b, stages});
-  }
+
+  const relevant = brackets.filter(b =>
+    b.rounds.some(r => r.bouts.some(bo => bo.fighters.some(isMine)))
+  );
 
   if (!relevant.length){
-    mainEl.innerHTML = `<div class="empty">No se encontraron combates con participantes de
-      <b>${esc(CFG.clubNombre)}</b> en los datos actuales. Puede que los cuadros todavía no
-      estén publicados, o que el workflow de GitHub Actions aún no haya corrido.
-      <br><br>Ve a <b>GitHub → Actions → Actualizar datos campeonato → Run workflow</b> para
-      forzar la primera descarga.</div>`;
+    mainEl.innerHTML = `<div class="msg">No se encontraron categorías con participantes de Chiralt
+      en los datos actuales. Si el campeonato aún no ha publicado los sorteos, los cuadros
+      aparecerán aquí en cuanto la federación los cargue.</div>`;
     return;
   }
 
-  for (const b of relevant){
+  for (const bracket of relevant){
     const card = document.createElement('div');
-    card.className = 'card';
-    const [main,...rest] = b.title.split('/');
-    const h2 = document.createElement('h2');
-    h2.textContent = main.trim();
-    card.appendChild(h2);
-    if (rest.length){
-      const meta = document.createElement('div');
-      meta.className = 'meta';
-      meta.textContent = rest.join(' · ').trim();
-      card.appendChild(meta);
-    }
-    for (const stage of b.stages){
-      const st = document.createElement('div');
-      st.className = 'stage';
-      st.textContent = stage.name;
-      card.appendChild(st);
-      for (const bout of stage.bouts){
-        const row = document.createElement('div');
-        row.className = 'bout';
+    card.className = 'cat-card';
+
+    /* Header */
+    const head = document.createElement('div');
+    head.className = 'cat-head';
+    head.innerHTML =
+      `<h2>${esc(bracket.catName)}<span class="mine-badge">CHIRALT</span></h2>`
+      + (bracket.catMeta ? `<div class="cat-meta">${esc(bracket.catMeta)}</div>` : '');
+    card.appendChild(head);
+
+    /* Rounds as scrollable columns */
+    const scroll = document.createElement('div');
+    scroll.className = 'bracket-scroll';
+    const cols = document.createElement('div');
+    cols.className = 'bracket-columns';
+
+    for (const round of bracket.rounds){
+      const col = document.createElement('div');
+      col.className = 'ronda-col';
+
+      const rtit = document.createElement('div');
+      rtit.className = 'ronda-tit';
+      rtit.textContent = round.name;
+      col.appendChild(rtit);
+
+      for (const bout of round.bouts){
+        const boutEl = document.createElement('div');
+        boutEl.className = 'bout';
+
         if (bout.meta){
           const bm = document.createElement('div');
-          bm.className = 'boutmeta';
+          bm.className = 'bout-meta';
           bm.textContent = bout.meta;
-          row.appendChild(bm);
+          boutEl.appendChild(bm);
         }
-        const pair = document.createElement('div');
-        pair.className = 'pair';
-        const [a,b2] = bout.fighters;
-        pair.appendChild(fighterEl(a, false, false));
-        pair.appendChild(scoreEl(a, b2));
-        pair.appendChild(fighterEl(b2, true, bout.isBye));
-        row.appendChild(pair);
-        card.appendChild(row);
+
+        for (const f of bout.fighters){
+          boutEl.appendChild(fighterEl(f, bout.isBye, bout.fighters, isMine));
+        }
+        col.appendChild(boutEl);
       }
+      cols.appendChild(col);
     }
+    scroll.appendChild(cols);
+    card.appendChild(scroll);
     mainEl.appendChild(card);
   }
 }
 
-/* ---- Loop principal ---- */
+function fighterEl(f, isBye, allFighters, isMine){
+  const el = document.createElement('div');
+  if (!f || f.tbd){
+    el.className = 'fighter tbd';
+    el.innerHTML = `<div class="fighter-info"><div class="fname">${isBye ? 'Bye' : 'Por determinar'}</div></div>`;
+    return el;
+  }
+
+  // Determine winner: highest score wins
+  const scores = allFighters.filter(x=>x&&!x.tbd&&x.score!==undefined).map(x=>Number(x.score));
+  const myScore = f.score !== undefined ? Number(f.score) : undefined;
+  const isWinner = scores.length >= 2 && myScore !== undefined && myScore === Math.max(...scores);
+
+  el.className = 'fighter ' + f.corner + (isMine(f) ? ' mine' : '');
+  el.innerHTML =
+    `<div class="fighter-info">` +
+    `<div class="fname">${esc(f.name)}</div>` +
+    `<div class="fclub">${esc(f.club)}</div>` +
+    `</div>` +
+    (f.score !== undefined
+      ? `<div class="fscore${isWinner?' winner':''}">${esc(f.score)}</div>`
+      : '');
+  return el;
+}
+
+/* ── Main loop ── */
 async function load(auto){
   refreshBtn.disabled = true;
   statusEl.textContent = 'Actualizando…';
-  try{
-    const html = await fetchSource();
-    const doc  = new DOMParser().parseFromString(html, 'text/html');
-    const brackets = [...doc.querySelectorAll('.piramide')].map(parseBracket);
+  try {
+    const {cfg, html} = await loadAll();
+    const isMine = makeIsMine(cfg.clubSigla || 'CHI');
+
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+
+    // Title from the federation page itself
+    const titulo    = t(doc.querySelector('#titulo'));
+    const subtitulo = t(doc.querySelector('#subtitulo'));
+    if (titulo){
+      document.getElementById('eventTitle').textContent = titulo;
+      document.title = 'Chiralt · ' + titulo;
+    }
+    if (subtitulo) document.getElementById('eventSubtitle').textContent = subtitulo;
+
+    const origUrl = `https://federacion.tkdcv.es/federacion/app/nosession.php?permiso=campeonato&operacion=contiendas&id=${encodeURIComponent(cfg.id)}`;
+    document.getElementById('origLink').href = origUrl;
+
+    const brackets = parseBrackets(doc);
     if (!brackets.length) throw new Error('No se encontraron cuadros (.piramide) en el archivo descargado.');
-    render(brackets);
+
+    render(brackets, isMine, cfg.id);
     statusEl.innerHTML = 'Última actualización: <b>' + new Date().toLocaleTimeString('es-ES') + '</b>';
-  }catch(e){
+
+  } catch(e) {
     console.error(e);
-    if (!auto || !mainEl.querySelector('.card')){
-      mainEl.innerHTML = `<div class="error">
-        <b>No se pudieron cargar los datos.</b><br><br>
+    if (!auto || !mainEl.querySelector('.cat-card')){
+      mainEl.innerHTML = `<div class="msg err"><b>No se pudieron cargar los datos.</b><br><br>
         ${esc(e.message)}<br><br>
-        Si acabas de configurar el repo, ve a <b>GitHub → Actions → "Actualizar datos campeonato"
-        → Run workflow</b> para lanzar la primera descarga manualmente.
-        El archivo <code>${esc(CFG.dataFile)}</code> debe existir en el repo con datos reales.
-      </div>`;
+        Si acabas de configurar el repo, ve a
+        <b>GitHub → Actions → "Actualizar datos campeonato" → Run workflow</b>
+        para lanzar la primera descarga manualmente.</div>`;
     }
     statusEl.textContent = 'Error al cargar.';
   } finally {
@@ -301,7 +366,6 @@ async function load(auto){
 
 refreshBtn.addEventListener('click', () => load(false));
 load(false);
-// Recarga cada 2 minutos — el workflow actualiza cada 5, así que esto es suficiente
 setInterval(() => load(true), 2 * 60 * 1000);
 </script>
 </body>
